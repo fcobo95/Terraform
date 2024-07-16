@@ -138,7 +138,7 @@ resource "azurerm_network_security_group" "nsg-subnet-a" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "subnet-a" {
-  subnet_id = azurerm_subnet.cdp-dl-subnet.id
+  subnet_id                 = azurerm_subnet.cdp-dl-subnet.id
   network_security_group_id = azurerm_network_security_group.nsg-subnet-a.id
 }
 

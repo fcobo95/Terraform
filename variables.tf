@@ -40,10 +40,10 @@ variable "storage_name" {
 
 variable "storage_container_name" {
   description = "Name of the data container that will be created inside the storage account."
-  type = string
+  type        = string
 }
 
 variable "vnet_name" {
   description = "Name of the virtual network we will be creating."
-  type = string
+  type        = string
 }
