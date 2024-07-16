@@ -1,3 +1,0 @@
-module "compute" {
-  source = "value"
-}
