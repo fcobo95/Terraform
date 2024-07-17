@@ -18,6 +18,7 @@ resource "azurerm_virtual_network" "cdp_vnet" {
   location            = var.location
   resource_group_name = var.terraform_resource_group
   address_space       = [local.address_space]
+  tags = var.tags
   depends_on = [
     azurerm_resource_group.terraform-training-rg
   ]
@@ -47,6 +48,7 @@ resource "azurerm_network_interface" "nic-cdp-dl" {
   name                = local.nic_name
   location            = var.location
   resource_group_name = var.terraform_resource_group
+  tags = var.tags
 
   ip_configuration {
     name                          = "internal"
@@ -65,6 +67,7 @@ resource "azurerm_public_ip" "nic-cdp-pip" {
   resource_group_name = var.terraform_resource_group
   location            = var.location
   allocation_method   = "Static"
+  tags = var.tags
   depends_on = [
     azurerm_resource_group.terraform-training-rg
   ]
@@ -74,6 +77,7 @@ resource "azurerm_network_security_group" "nsg-cdp-dl-subnet" {
   name                = var.nsg_cdp_dl
   resource_group_name = var.terraform_resource_group
   location            = var.location
+  tags = var.tags
 
   security_rule {
     name                       = "ssh"

@@ -8,6 +8,7 @@ resource "azurerm_storage_account" "storageaccount" {
   is_hns_enabled           = true # Hierarchical namespace (Datalake)
   account_replication_type = "LRS"
   access_tier              = "Hot"
+  tags = var.tags
   depends_on = [
     azurerm_resource_group.terraform-training-rg
   ]

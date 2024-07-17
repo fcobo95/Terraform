@@ -25,4 +25,5 @@ resource "azurerm_windows_virtual_machine" "terraform_vm" {
     azurerm_network_interface.nic-cdp-dl,
     azurerm_resource_group.terraform-training-rg
   ]
+  tags = var.tags
 }
