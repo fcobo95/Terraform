@@ -10,22 +10,22 @@ locals {
       address_prefix = "10.1.2.0/24"
     }
   ]
-  nic_name = "nic-a"
+  nic_name = "nic-cdp-dl"
 }
 
 resource "azurerm_virtual_network" "cdp_vnet" {
   name                = var.vnet_name
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = var.terraform_resource_group
   address_space       = [local.address_space]
   depends_on = [
-    azurerm_resource_group.rg
+    azurerm_resource_group.terraform-training-rg
   ]
 }
 
 resource "azurerm_subnet" "cdp-dl-subnet" {
   name                 = local.subnets[0].name
-  resource_group_name  = var.resource_group
+  resource_group_name  = var.terraform_resource_group
   virtual_network_name = var.vnet_name
   address_prefixes     = [local.subnets[0].address_prefix]
   depends_on = [
@@ -35,7 +35,7 @@ resource "azurerm_subnet" "cdp-dl-subnet" {
 
 resource "azurerm_subnet" "cdp-cdf-subnet" {
   name                 = local.subnets[1].name
-  resource_group_name  = var.resource_group
+  resource_group_name  = var.terraform_resource_group
   virtual_network_name = var.vnet_name
   address_prefixes     = [local.subnets[1].address_prefix]
   depends_on = [
@@ -43,16 +43,16 @@ resource "azurerm_subnet" "cdp-cdf-subnet" {
   ]
 }
 
-resource "azurerm_network_interface" "nic-a" {
+resource "azurerm_network_interface" "nic-cdp-dl" {
   name                = local.nic_name
   location            = var.location
-  resource_group_name = var.resource_group
+  resource_group_name = var.terraform_resource_group
 
   ip_configuration {
     name                          = "internal"
     subnet_id                     = tolist(azurerm_virtual_network.cdp_vnet.subnet)[0].id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.nic-pip.id
+    public_ip_address_id          = azurerm_public_ip.nic-cdp-pip.id
   }
 
   depends_on = [
@@ -60,19 +60,19 @@ resource "azurerm_network_interface" "nic-a" {
   ]
 }
 
-resource "azurerm_public_ip" "nic-pip" {
-  name                = "nic-pip"
-  resource_group_name = var.resource_group
+resource "azurerm_public_ip" "nic-cdp-pip" {
+  name                = var.nic_cdp_pip
+  resource_group_name = var.terraform_resource_group
   location            = var.location
   allocation_method   = "Static"
   depends_on = [
-    azurerm_resource_group.rg
+    azurerm_resource_group.terraform-training-rg
   ]
 }
 
-resource "azurerm_network_security_group" "nsg-subnet-a" {
-  name                = "nsg-subnet-a"
-  resource_group_name = var.resource_group
+resource "azurerm_network_security_group" "nsg-cdp-dl-subnet" {
+  name                = var.nsg_cdp_dl
+  resource_group_name = var.terraform_resource_group
   location            = var.location
 
   security_rule {
@@ -135,11 +135,14 @@ resource "azurerm_network_security_group" "nsg-subnet-a" {
     destination_address_prefix = local.subnets[0].address_prefix
   }
 
+  depends_on = [azurerm_resource_group.terraform-training-rg]
+
 }
 
-resource "azurerm_subnet_network_security_group_association" "subnet-a" {
+resource "azurerm_subnet_network_security_group_association" "cdp-dl-subnet-nsg-association" {
   subnet_id                 = azurerm_subnet.cdp-dl-subnet.id
-  network_security_group_id = azurerm_network_security_group.nsg-subnet-a.id
+  network_security_group_id = azurerm_network_security_group.nsg-cdp-dl-subnet.id
+  depends_on                = [azurerm_subnet.cdp-dl-subnet]
 }
 
 output "subnets" {

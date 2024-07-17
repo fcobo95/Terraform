@@ -1,4 +1,4 @@
-resource "azurerm_resource_group" "rg" {
-  name     = var.resource_group
+resource "azurerm_resource_group" "terraform-training-rg" {
+  name     = var.terraform_resource_group
   location = var.location
 }

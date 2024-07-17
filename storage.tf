@@ -2,14 +2,14 @@
 resource "azurerm_storage_account" "storageaccount" {
   name                     = var.storage_name
   location                 = var.location
-  resource_group_name      = var.resource_group
+  resource_group_name      = var.terraform_resource_group
   account_tier             = "Standard"
   account_kind             = "StorageV2"
   is_hns_enabled           = true # Hierarchical namespace (Datalake)
   account_replication_type = "LRS"
   access_tier              = "Hot"
   depends_on = [
-    azurerm_resource_group.rg
+    azurerm_resource_group.terraform-training-rg
   ]
 }
 
@@ -22,7 +22,7 @@ resource "azurerm_storage_container" "data" {
   ]
 }
 
-resource "azurerm_storage_blob" "main" {
+/* resource "azurerm_storage_blob" "main" {
   name                   = "main.tf"
   storage_account_name   = var.storage_name
   storage_container_name = var.storage_container_name
@@ -31,4 +31,4 @@ resource "azurerm_storage_blob" "main" {
   depends_on = [
     azurerm_storage_container.data
   ]
-}
+} */

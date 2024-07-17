@@ -1,4 +1,4 @@
-variable "resource_group" {
+variable "terraform_resource_group" {
   description = "This is a variable used in TF to create a new resource group and kinda hide the name from the actual code and add it in the terrafom.tfvars file instead."
   type        = string
 }
@@ -46,4 +46,29 @@ variable "storage_container_name" {
 variable "vnet_name" {
   description = "Name of the virtual network we will be creating."
   type        = string
+}
+
+variable "nsg_cdp_dl" {
+  description = "NSG for the CDP DL Subnet"
+  type        = string
+}
+
+variable "nic_cdp_pip" {
+  description = "Public IP for the NIC for the CDP VM in CDP DL subnet"
+  type        = string
+}
+
+variable "vm_name" {
+  description = "Name of the Virtual Machine"
+  type = string
+}
+
+variable "admin_username" {
+  description = "VM admin username"
+  type = string
+}
+
+variable "admin_password" {
+  description = "Admin password for the VM"
+  type = string
 }
