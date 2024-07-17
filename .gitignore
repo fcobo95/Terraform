@@ -25,3 +25,8 @@ terraform.rc
 .terraform.lock.hcl
 test/*
 .DS_store
+
+# Exclude terraform plans
+*.*.tfplan
+*.tfplan
+tfplan

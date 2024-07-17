@@ -2,7 +2,7 @@ resource "azurerm_windows_virtual_machine" "terraform_vm" {
   name                = var.vm_name
   resource_group_name = var.terraform_resource_group
   location            = var.location
-  size                = "Standard_D2S_v3"
+  size                = "Standard_D2s_v3"
   admin_username      = var.admin_username
   admin_password      = var.admin_password
   network_interface_ids = [
