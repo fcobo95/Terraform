@@ -11,6 +11,8 @@ locals {
     }
   ]
   nic_name = "nic-cdp-dl"
+  nic_name_scndr = "nic-cdp-dl-secondary"
+  nic_cdp_pip_scndr = "nic-cdp-dl"
 }
 
 resource "azurerm_virtual_network" "cdp_vnet" {
@@ -62,6 +64,23 @@ resource "azurerm_network_interface" "nic-cdp-dl" {
   ]
 }
 
+resource "azurerm_network_interface" "nic-cdp-dl-secondary" {
+  name                = local.nic_name_scndr
+  location            = var.location
+  resource_group_name = var.terraform_resource_group
+  tags = var.tags
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = tolist(azurerm_virtual_network.cdp_vnet.subnet)[1].id
+    private_ip_address_allocation = "Dynamic"
+  }
+
+  depends_on = [
+    azurerm_virtual_network.cdp_vnet
+  ]
+}
+
 resource "azurerm_public_ip" "nic-cdp-pip" {
   name                = var.nic_cdp_pip
   resource_group_name = var.terraform_resource_group
@@ -99,7 +118,7 @@ resource "azurerm_network_security_group" "nsg-cdp-dl-subnet" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = 3389
-    source_address_prefixes    = [local.subnets[0].address_prefix, local.subnets[1].address_prefix]
+    source_address_prefixes    = [local.subnets[0].address_prefix, local.subnets[1].address_prefix, "190.113.101.0/24"]
     destination_address_prefix = local.subnets[0].address_prefix
   }
 

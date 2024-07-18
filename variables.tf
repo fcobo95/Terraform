@@ -58,6 +58,11 @@ variable "nic_cdp_pip" {
   type        = string
 }
 
+variable "nic_cdp_pip_scndr" {
+  description = "Public IP for the NIC for the CDP VM in CDP DL subnet"
+  type        = string
+}
+
 variable "vm_name" {
   description = "Name of the Virtual Machine"
   type = string
