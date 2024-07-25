@@ -65,15 +65,20 @@ variable "nic_cdp_pip_scndr" {
 
 variable "vm_name" {
   description = "Name of the Virtual Machine"
-  type = string
+  type        = string
 }
 
 variable "admin_username" {
   description = "VM admin username"
-  type = string
+  type        = string
 }
 
 variable "admin_password" {
   description = "Admin password for the VM"
-  type = string
+  type        = string
+}
+
+variable "linux_vm_name" {
+  description = "Name of the Linux VM"
+  type        = string
 }
