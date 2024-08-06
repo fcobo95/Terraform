@@ -12,6 +12,7 @@ resource "azurerm_windows_virtual_machine" "windows-vms" {
   network_interface_ids = [
     azurerm_network_interface.windows-network-interfaces[count.index].id
   ]
+  availability_set_id = azurerm_availability_set.windows-vms-as.id
 
   os_disk {
     caching              = "ReadWrite"
