@@ -34,8 +34,18 @@ variable "address_space" {
   default     = "10.101.0.0/16"
 }
 
-variable "number_of_subnets" {
-  description = "The numeric value of the amount of subnets you want to create"
-  type        = number
-  default     = 2
+variable "nsg_name" {
+  description = "NSG name"
+  type = string
+}
+
+variable "vm_sku" {
+  description = "Defines the VM's SKU type."
+  type = string
+  default = "Standard_D2s_v3"
+}
+
+variable "admin_password" {
+  description = "Let TF request the plain text password for the VMs."
+  type = string
 }
