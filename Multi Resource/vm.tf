@@ -2,15 +2,15 @@
 # Azure Windows Virtual Machine Resources #
 ###########################################
 resource "azurerm_windows_virtual_machine" "windows-vms" {
-  for_each            = local.cdp_subnets
-  name                = "${each.key}-win-vm"
+  count               = var.number_of_vms
+  name                = "win-vm-${count.index}"
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = var.vm_sku
   admin_username      = var.owner
   admin_password      = var.admin_password
   network_interface_ids = [
-    azurerm_network_interface.windows-network-interfaces[each.key].id
+    azurerm_network_interface.windows-network-interfaces[count.index].id
   ]
 
   os_disk {
@@ -33,8 +33,8 @@ resource "azurerm_windows_virtual_machine" "windows-vms" {
 }
 
 resource "azurerm_managed_disk" "windows_vm_datadisks" {
-  for_each             = local.cdp_subnets
-  name                 = "${each.key}-win-dd"
+  count                = var.number_of_vms
+  name                 = "win-dd-${count.index}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = "Standard_LRS"
@@ -48,9 +48,9 @@ resource "azurerm_managed_disk" "windows_vm_datadisks" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "windows_vm_datadisks" {
-  for_each           = local.cdp_subnets
-  managed_disk_id    = azurerm_managed_disk.windows_vm_datadisks[each.key].id
-  virtual_machine_id = azurerm_windows_virtual_machine.windows-vms[each.key].id
+  count              = var.number_of_vms
+  managed_disk_id    = azurerm_managed_disk.windows_vm_datadisks[count.index].id
+  virtual_machine_id = azurerm_windows_virtual_machine.windows-vms[count.index].id
   lun                = "0"
   caching            = "ReadWrite"
 
@@ -60,20 +60,33 @@ resource "azurerm_virtual_machine_data_disk_attachment" "windows_vm_datadisks" {
   ]
 }
 
+resource "azurerm_availability_set" "windows-vms-as" {
+  name                         = "windows-as"
+  location                     = var.location
+  resource_group_name          = var.resource_group_name
+  platform_fault_domain_count  = 3
+  platform_update_domain_count = 3
+  tags                         = var.tags
+
+  depends_on = [
+    azurerm_resource_group.multi-resource-rg-tf
+  ]
+}
+
 ###########################################
 # Azure Linux Virtual Machine Resources   #
 ###########################################
 
 resource "azurerm_linux_virtual_machine" "linux-vms" {
-  for_each            = local.cdp_subnets
-  name                = "${each.key}-lnx-vm"
+  count               = var.number_of_vms
+  name                = "lnx-vm-${count.index}"
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = "Standard_D2s_v3"
   admin_username      = var.owner
 
   network_interface_ids = [
-    azurerm_network_interface.linux-network-interfaces[each.key].id
+    azurerm_network_interface.linux-network-interfaces[count.index].id
   ]
 
   admin_ssh_key {
@@ -100,8 +113,8 @@ resource "azurerm_linux_virtual_machine" "linux-vms" {
 }
 
 resource "azurerm_managed_disk" "linux_vm_datadisks" {
-  for_each             = local.cdp_subnets
-  name                 = "${each.key}-lnx-dd"
+  count                = var.number_of_vms
+  name                 = "lnx-dd-${count.index}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = "Standard_LRS"
@@ -115,9 +128,9 @@ resource "azurerm_managed_disk" "linux_vm_datadisks" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "linux_vm_datadisks" {
-  for_each           = local.cdp_subnets
-  managed_disk_id    = azurerm_managed_disk.linux_vm_datadisks[each.key].id
-  virtual_machine_id = azurerm_linux_virtual_machine.linux-vms[each.key].id
+  count              = var.number_of_vms
+  managed_disk_id    = azurerm_managed_disk.linux_vm_datadisks[count.index].id
+  virtual_machine_id = azurerm_linux_virtual_machine.linux-vms[count.index].id
   lun                = "0"
   caching            = "ReadWrite"
 

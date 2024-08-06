@@ -1,5 +1,5 @@
 ###########################################
-# Azure Virtual Network Creation + Sunets #
+# Azure Virtual Network Creation + Subnets#
 ###########################################
 resource "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
@@ -22,35 +22,12 @@ resource "azurerm_subnet" "mgmt-subnet" {
   ]
 }
 
-locals {
-  /*
-    cidrsubnet(prefix, newbits, netnum)
-
-    cidrsubnet("10.101.0.0/16", 24 - 16, 1)
-    cidrsubnet("10.101.0.0/16"), 8, 1)
-
-    cidrsubnet(16, 8, 1)
-    prefix = 10.101.1.0/24
-    newbits= 16 (prefix /16) + 8 = 24
-    netnum = 1
-    subnet 10.101.1.0/24
-    */
-  cdp_subnets = {
-    cdp-dl = cidrsubnet(var.address_space, 8, 1)
-    cdf    = cidrsubnet(var.address_space, 8, 2)
-    cml    = cidrsubnet(var.address_space, 8, 3)
-    cde    = cidrsubnet(var.address_space, 8, 4)
-    cod    = cidrsubnet(var.address_space, 8, 5)
-    dh     = cidrsubnet(var.address_space, 8, 6)
-  }
-}
-
 resource "azurerm_subnet" "subnets" {
-  for_each             = local.cdp_subnets
-  name                 = each.key
+  count                = var.number_of_subnets
+  name                 = "subnet${count.index}"
   resource_group_name  = var.resource_group_name
   virtual_network_name = var.vnet_name
-  address_prefixes     = [each.value]
+  address_prefixes     = [cidrsubnet(var.address_space, 8, (count.index + 1))]
   service_endpoints    = ["Microsoft.Sql", "Microsoft.Storage", "Microsoft.KeyVault"]
   depends_on = [
     azurerm_virtual_network.vnet
@@ -62,7 +39,7 @@ resource "azurerm_network_security_group" "nsg-vms" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-security_rule {
+  security_rule {
     name                       = "ssh"
     priority                   = 100
     direction                  = "Inbound"
@@ -141,11 +118,24 @@ security_rule {
     destination_address_prefix = var.address_space
   }
 
+  depends_on = [
+    azurerm_resource_group.multi-resource-rg-tf
+  ]
+
 }
 
 resource "azurerm_subnet_network_security_group_association" "nsg-association" {
-  for_each                  = local.cdp_subnets
-  subnet_id                 = azurerm_subnet.subnets[each.key].id
+  count                     = var.number_of_subnets
+  subnet_id                 = azurerm_subnet.subnets[count.index].id
+  network_security_group_id = azurerm_network_security_group.nsg-vms.id
+
+  depends_on = [
+    azurerm_network_security_group.nsg-vms
+  ]
+}
+
+resource "azurerm_subnet_network_security_group_association" "nsg-association-mgmt" {
+  subnet_id                 = azurerm_subnet.mgmt-subnet.id
   network_security_group_id = azurerm_network_security_group.nsg-vms.id
 
   depends_on = [
@@ -157,11 +147,9 @@ resource "azurerm_subnet_network_security_group_association" "nsg-association" {
 # Azure Windows Virtual Machine Resources #
 ###########################################
 
-
-
 resource "azurerm_public_ip" "windows-public-ips" {
-  for_each            = local.cdp_subnets
-  name                = "${each.key}-windows-pip"
+  count               = var.number_of_vms
+  name                = "windows-pip-${count.index}"
   resource_group_name = var.resource_group_name
   location            = var.location
   allocation_method   = "Static"
@@ -173,16 +161,16 @@ resource "azurerm_public_ip" "windows-public-ips" {
 }
 
 resource "azurerm_network_interface" "windows-network-interfaces" {
-  for_each            = local.cdp_subnets
-  name                = "${azurerm_subnet.subnets[each.key].name}-win"
+  count               = var.number_of_vms
+  name                = "win-nic-${count.index}"
   location            = var.location
   resource_group_name = var.resource_group_name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.subnets[each.key].id
+    subnet_id                     = azurerm_subnet.subnets[count.index].id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.windows-public-ips[each.key].id
+    public_ip_address_id          = azurerm_public_ip.windows-public-ips[count.index].id
   }
 
   depends_on = [
@@ -196,8 +184,8 @@ resource "azurerm_network_interface" "windows-network-interfaces" {
 ###########################################
 
 resource "azurerm_public_ip" "linux-public-ips" {
-  for_each            = local.cdp_subnets
-  name                = "${each.key}-linux-pip"
+  count               = var.number_of_vms
+  name                = "linux-pip-${count.index}"
   resource_group_name = var.resource_group_name
   location            = var.location
   allocation_method   = "Static"
@@ -209,16 +197,16 @@ resource "azurerm_public_ip" "linux-public-ips" {
 }
 
 resource "azurerm_network_interface" "linux-network-interfaces" {
-  for_each            = local.cdp_subnets
-  name                = "${azurerm_subnet.subnets[each.key].name}-linux"
+  count               = var.number_of_vms
+  name                = "linux-nic-${count.index}"
   location            = var.location
   resource_group_name = var.resource_group_name
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.subnets[each.key].id
+    subnet_id                     = azurerm_subnet.subnets[count.index].id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.linux-public-ips[each.key].id
+    public_ip_address_id          = azurerm_public_ip.linux-public-ips[count.index].id
   }
 
   depends_on = [

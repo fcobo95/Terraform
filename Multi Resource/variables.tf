@@ -49,3 +49,15 @@ variable "admin_password" {
   description = "Let TF request the plain text password for the VMs."
   type = string
 }
+
+variable "number_of_vms" {
+  description = "Set the value for the amount of VMs you want to deploy."
+  type = number
+  default = 1
+}
+
+variable "number_of_subnets" {
+  description = "Set the value of the amount of subnets to be created."
+  type = number
+  default = 1
+}
