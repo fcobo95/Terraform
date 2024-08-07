@@ -1,26 +1,20 @@
 # create empty storage account
 resource "azurerm_storage_account" "storageaccount" {
   name                     = var.storage_name
-  location                 = var.location
-  resource_group_name      = var.terraform_resource_group
+  location                 = azurerm_resource_group.terraform-training-rg.location
+  resource_group_name      = azurerm_resource_group.terraform-training-rg.name
   account_tier             = "Standard"
   account_kind             = "StorageV2"
   is_hns_enabled           = true # Hierarchical namespace (Datalake)
   account_replication_type = "LRS"
   access_tier              = "Hot"
   tags = var.tags
-  depends_on = [
-    azurerm_resource_group.terraform-training-rg
-  ]
 }
 
 #create storage account container
 resource "azurerm_storage_container" "data" {
   name                 = var.storage_container_name
-  storage_account_name = var.storage_name
-  depends_on = [
-    azurerm_storage_account.storageaccount
-  ]
+  storage_account_name = azurerm_storage_account.storageaccount.name
 }
 
 /* resource "azurerm_storage_blob" "main" {
