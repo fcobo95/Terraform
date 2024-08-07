@@ -45,7 +45,7 @@ resource "azurerm_network_interface" "nic-cdp-dl" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = tolist(azurerm_virtual_network.cdp_vnet.subnet)[0].id
+    subnet_id                     = azurerm_subnet.cdp-dl-subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.nic-cdp-pip.id
   }
@@ -59,7 +59,7 @@ resource "azurerm_network_interface" "nic-cdp-dl-secondary" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = tolist(azurerm_virtual_network.cdp_vnet.subnet)[1].id
+    subnet_id                     = azurerm_subnet.cdp-dl-subnet.id
     private_ip_address_allocation = "Dynamic"
   }
 }
