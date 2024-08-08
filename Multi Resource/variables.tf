@@ -36,28 +36,33 @@ variable "address_space" {
 
 variable "nsg_name" {
   description = "NSG name"
-  type = string
+  type        = string
 }
 
 variable "vm_sku" {
   description = "Defines the VM's SKU type."
-  type = string
-  default = "Standard_D2s_v3"
+  type        = string
+  default     = "Standard_D2s_v3"
 }
 
 variable "admin_password" {
   description = "Let TF request the plain text password for the VMs."
-  type = string
+  type        = string
 }
 
 variable "number_of_vms" {
   description = "Set the value for the amount of VMs you want to deploy."
-  type = number
-  default = 1
+  type        = number
+  default     = 1
 }
 
 variable "number_of_subnets" {
   description = "Set the value of the amount of subnets to be created."
-  type = number
-  default = 1
+  type        = number
+  default     = 1
+}
+
+variable "key_vault_name" {
+  description = "Set the name of the Key Vault to be created."
+  type        = string
 }

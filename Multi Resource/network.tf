@@ -132,8 +132,8 @@ resource "azurerm_public_ip" "windows-public-ips" {
   location            = azurerm_resource_group.multi-resource-rg-tf.location
   allocation_method   = "Static"
   #zones               = ["1", "2", "3"]
-  sku                 = "Standard"
-  tags                = var.tags
+  sku  = "Standard"
+  tags = var.tags
 }
 
 resource "azurerm_network_interface" "windows-network-interfaces" {
