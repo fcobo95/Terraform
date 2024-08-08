@@ -45,11 +45,6 @@ variable "vm_sku" {
   default     = "Standard_D2s_v3"
 }
 
-variable "admin_password" {
-  description = "Let TF request the plain text password for the VMs."
-  type        = string
-}
-
 variable "number_of_vms" {
   description = "Set the value for the amount of VMs you want to deploy."
   type        = number

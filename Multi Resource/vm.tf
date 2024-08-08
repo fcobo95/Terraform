@@ -8,7 +8,7 @@ resource "azurerm_windows_virtual_machine" "windows-vms" {
   location            = azurerm_resource_group.multi-resource-rg-tf.location
   size                = var.vm_sku
   admin_username      = var.owner
-  admin_password      = var.admin_password
+  admin_password      = azurerm_key_vault_secret.vmpassword.value
   network_interface_ids = [
     azurerm_network_interface.windows-network-interfaces[count.index].id
   ]
